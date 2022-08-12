@@ -12,7 +12,8 @@ export function bitsocket(app_id: string) : EventEmitter {
         q: {
           find: {
             "out.s2": app_id,
-            "out.s21": 'reply'
+            "out.s3": { "$ne": 'bas' },
+            "out.s19": { "$ne": 'null' }
           },
           project: {
             "raw": 1,
