@@ -7,7 +7,6 @@ const config = {
 		seed: process.env.SEED,
 		paymail: process.env.PAYMAIL
 	},
-	xpriv: process.env.XPRIV,
 	authToken: process.env.AUTH_TOKEN,
 	apiUrl: 'https://api.twetch.app'
 }

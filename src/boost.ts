@@ -12,7 +12,7 @@ import TwetchWallet from "./twetch/twetch-wallet"
 import config from "./twetch/config"
 import { Script, Transaction, TxOut } from "bsv-wasm"
 
-
+const Twetch = require("@twetch/sdk")
 
 interface CreateBoostPowTransaction {
     content_tx_id: string;
@@ -52,6 +52,33 @@ function createBoostpowTransaction(params: CreateBoostPowTransaction): bsv.Trans
 }
 
 async function loadWallet() {
+
+    const seed = config.metasync.seed
+    const paymail = config.metasync.paymail
+
+    const twetch = new Twetch()
+    
+    if(!seed){
+        throw new Error('seed must be set')
+    }
+    
+    if(!paymail){
+        throw new Error('paymail must be set')
+    }
+
+    const private_key = twetch.crypto.privFromMnemonic(seed)
+  
+    const wallet = new Wallet(private_key)
+  
+    await wallet.sync()
+  
+    return wallet
+    /*
+    */
+  
+  }
+
+/* async function loadWallet() {
     const seed = config.metasync.seed
     const paymail = config.metasync.paymail
     
@@ -68,41 +95,38 @@ async function loadWallet() {
 
 
     return wallet
-}
+} */
 
 export async function boost({content_tx_id, content_tx_index, value, currency='USD'}) {
 
-    try {
-        const { satoshis, difficulty } = await prices.quoteDifficulty({currency, value })
+    const { satoshis, difficulty } = await prices.quoteDifficulty({ currency, value })
 
-        console.log({satoshis, difficulty})
+    console.log({ satoshis, difficulty })
 
-        //let transaction = createBoostpowTransaction({ content_tx_id, content_tx_index, difficulty, satoshis})
+    let transaction = createBoostpowTransaction({ content_tx_id, content_tx_index, difficulty, satoshis })
 
-        const wallet: any = await loadWallet()
+    console.log(transaction.serialize(true))
 
-        const job = boostpow.Job.fromObject({
-            content: content_tx_id,
-            diff: difficulty,
-            tag: 'BoostDat'
-        })
-        const transaction = new Transaction(2,null)
+    const wallet: any = await loadWallet()
 
-        const asm = job.toASM()
-        const script = Script.fromASMString(asm.toString())
+    transaction.from(wallet.utxos)
 
-        const ouput = new TxOut(BigInt(satoshis), script)
-        transaction.addOutput(ouput)
+    transaction.change(wallet.address)
 
-        const {rawtx, txid } = await wallet.buildTxForTransactionProps(transaction.toHex())
+    transaction.sign(wallet.private_key)
+
+    console.log({ transaction })
+
+    console.log('SERIALIZE')
+
+    const hex = transaction.serialize(true)
+
+    console.log({ hex })
+
+    console.log({ hex, txid: transaction.hash })
+
+    let result = await run.blockchain.broadcast(hex)
+
+    console.log('run.blockchain.broadcast.result', { result })
         
-        let result = await run.blockchain.broadcast(rawtx)
-
-        return txid
-
-    } catch (error) {
-        
-        console.log("ERROR ", error)
     }
-    
-}

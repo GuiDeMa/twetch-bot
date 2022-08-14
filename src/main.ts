@@ -1,7 +1,7 @@
+import { BoostPowString } from "boostpow"
 import { bitsocket } from "./bitsocket"
 import { boost } from "./boost"
 import postTwetch from "./twetch/post-twetch"
-import { twetchsocket } from "./twetchsocket"
 
 const TWETCH_APP_ID = "19HxigV4QyBv3tHpQVcUEQyq1pzZVdoAut"
 
@@ -9,7 +9,6 @@ export async function start() {
 
     console.log("server started")
     
-    //twetchsocket()
 
 
     const boostbot = bitsocket(TWETCH_APP_ID)
@@ -28,11 +27,20 @@ export async function start() {
 
     })
 
+    //test post
+    /* let content = `gm 🦚
+    I am your friendly neighbourhood BoostPow bot.
+    Add more hash power to your best twetches by /paying me $0.05 in reply to the post you mean to boost.
+    
+    (make sure your post is encrypted as i don't follow cryptic commands)`
+    await postTwetch(content) */
+
     //test boost
-    /* let content_tx_id= "b0bb07ac51359e589b714a520146440e36ed040e1a7ae57e996ad8a5aede7da3";
+    let content_tx_id= "b0bb07ac51359e589b714a520146440e36ed040e1a7ae57e996ad8a5aede7da3";
     let content_tx_index=1;
     let value=0.05;
-    await boost({ content_tx_id, content_tx_index, value }) */
+   
+    await boost({ content_tx_id, content_tx_index, value })
 
     
 }

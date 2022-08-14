@@ -87,6 +87,12 @@ class TwetchWallet {
 		publish: boolean
 		publishParams?: PublishParams
 	}> {
+		console.log("PAYLOAD_PUBLISH",{
+			broadcast: true,
+			action,
+			signed_raw_tx: rawtx,
+			payParams
+		})
 		try {
 			const { data } = await axios.post(
 				`${config.apiUrl}/v1/publish`,
@@ -105,6 +111,7 @@ class TwetchWallet {
 
 			return data
 		} catch (e) {
+			//console.log(e)
 			console.log(e?.response?.data?.errors?.length)
 			if (e?.response?.data?.errors?.length) {
 				throw new Error(`Publish Error: ${e.response.data.errors.join(', ')}`)
@@ -130,6 +137,14 @@ class TwetchWallet {
 			user_id: string
 		}[]
 	}> {
+		console.log("PAYLOAD PAYEES", {
+			args,
+			action,
+			client_identifier: '1325c30a-7eb3-4169-a6f4-330eeeb8ca49',
+			payload: {
+				resolveChange: true
+			}
+		} )
 		const { data } = await axios.post(
 			`${config.apiUrl}/v1/payees`,
 			{
@@ -146,6 +161,8 @@ class TwetchWallet {
 				}
 			}
 		)
+
+		console.log("PAYEE RESULT", data)
 
 		return data
 	}
@@ -225,11 +242,18 @@ class TwetchWallet {
 		const bsv = (outputs.reduce((a, e) => a + e.sats, 0) / 1e8).toFixed(8)
 		const usd = (exchangeRate * parseFloat(bsv)).toFixed(2)
 
+		console.log("BUILD TX PAYLOAD", {
+			outputs,
+			changeAddress,
+			resolveChange
+		})
 		const { rawtx, txid, encryptedHash, paymentDestinations } = await this.buildTx({
 			outputs,
 			changeAddress,
 			resolveChange
 		})
+
+		console.log("BUILD TX RESULT",{ rawtx, txid, encryptedHash, paymentDestinations } )
 
 		try {
 			if (action) {

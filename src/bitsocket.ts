@@ -62,22 +62,25 @@ export function bitsocket(app_id: string) : EventEmitter {
 
             console.log(output)
 
-            // Need regex
-            if (output.content.startsWith(`/pay @${BOT_TWETCH_ID} $0.05`)){
-                
-                console.log('boostpow bot called')
+            if (output.content){
+                // Need regex
+                if (output.content.startsWith(`/pay @${BOT_TWETCH_ID} $0.05`)){
+                    
+                    console.log('boostpow bot called')
 
-                if (emitter) {
+                    if (emitter) {
 
-                    emitter.emit('order', {target: output.target_txid, call: output.call_txid})
+                        emitter.emit('order', {target: output.target_txid, call: output.call_txid})
 
-                    emitter.emit('*', output)
-                        
+                        emitter.emit('*', output)
+                            
+                    }
+
+
+
                 }
-
-
-
             }
+            
 
         }
     }

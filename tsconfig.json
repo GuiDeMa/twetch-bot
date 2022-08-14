@@ -11,7 +11,7 @@
     "outDir": "dist",
 		"sourceMap": true,
 		"sourceRoot": "src",
-    "types": ["node", "mocha"]
+    "types": ["node"]
   },
   "exclude": [
     "node_modules",
